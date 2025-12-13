@@ -8,6 +8,8 @@ import (
 )
 
 func home(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Server", "Go")     //need type before WriteHEader
+	w.WriteHeader(http.StatusAccepted) //need type defore Write
 	w.Write([]byte("HEllo from snippetbox"))
 
 }
@@ -33,8 +35,10 @@ func snippetCreate(w http.ResponseWriter, r *http.Request) {
 
 }
 func snippetCreatePost(w http.ResponseWriter, r *http.Request) {
+	//use the method to send a 201 status code
+	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte("Save a new snippet..."))
-
+	//
 }
 func main() {
 	mux := http.NewServeMux()
