@@ -1,21 +1,29 @@
 {{define "base"}}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{{template "title" .}} - Snippetbox</title>
-</head>
-<body>
+  </head>
+  <body>
     <header>
-        <h1>
-            <a href="/">Snippetbox</a>
-        </h1>
-        <main>
-            {{template "main" .}}
-        </main>
-        <footer>Powered by <a href="https://golang.org">Go</a></footer>
+       {{block "sidebar" .}}
+       <!-- This is block for demonstrating using optionly behavior 
+        BLOCK for that havent implementing  
+        dependence DEFINE a partial of html
+        NOTE: using double curly braces into comments 
+        also be parsed and invoked a error
+        -->
+        <h3>SIDEBAR</h3>
+        {{end}}
+      <h1>
+        <a href="/">Snippetbox</a>
+      </h1>
     </header>
-</body>
+    {{template "nav" .}}
+    <main>{{template "main" .}}</main>
+    <footer>Powered by <a href="https://golang.org">Go</a></footer>
+  </body>
 </html>
 {{end}}
