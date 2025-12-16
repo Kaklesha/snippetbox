@@ -17,7 +17,8 @@ func (h *homeD) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("this is my homeD page"))
 }
 
-func home(w http.ResponseWriter, r *http.Request) {
+// UDP: Changed the signature of the home handler so it is defined as a method against
+func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	////Manipulating the header map
 	//Set a new cache-control header . If an existing "Cache-Control" header exists
 	// it will be overwritten.
@@ -58,7 +59,14 @@ func home(w http.ResponseWriter, r *http.Request) {
 
 	ts, err := template.ParseFiles(files...)
 	if err != nil {
-		log.Print(err.Error())
+		//Because the home handler is now a method against the application
+		//struct it can access its fields, including the structured logger.
+		//We'll use this to create a log entry at Error level containing the error
+		//message, also including the request method and URL as attributes to
+		//assist with debugging.
+		//!UDP in here below implemented r.URL.String() that returns the full URL stirng
+		// Against r.URL.RequestURL that undefined (type *url.URL has no field or method RequestURL)
+		app.logger.Error(err.Error(), "method", r.Method, "url", r.URL.String())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
@@ -78,7 +86,9 @@ func home(w http.ResponseWriter, r *http.Request) {
 }
 
 // add a snippetView  handler function.
-func snippetView(w http.ResponseWriter, r *http.Request) {
+// Changed the signature of the snippetView handler so it is defined as a method
+// against *application
+func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 	//Extract the value of the id wildcard from the request using r.PathValue()
 	//and try to convert it to an integer using the strconv.Atoi() function. If
 	// return a 404 page not found response.
@@ -92,15 +102,19 @@ func snippetView(w http.ResponseWriter, r *http.Request) {
 }
 
 // Add a snippetCreate handler function.
-func snippetCreate(w http.ResponseWriter, r *http.Request) {
+// Changed the signature of the snippetView handler so it is defined as a method
+// against *application
+func (app *application) snippetCreate(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	w.Write([]byte(`{"name":"Display a form for creating a new snippet..."}`))
 
 }
-func snippetCreatePost(w http.ResponseWriter, r *http.Request) {
+
+// Changed the signature of the snippetView handler so it is defined as a method
+// against *application
+func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request) {
 	//use the method to send a 201 status code
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte("Save a new snippet..."))
-	//
 }

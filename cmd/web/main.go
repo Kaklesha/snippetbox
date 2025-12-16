@@ -7,6 +7,13 @@ import (
 	"os"
 )
 
+// Define an application struct to hold the application-wide dependencies fot the
+// web application. For now we'll only include the structured logger, but we'll
+// add more to this as the build progresses.
+type application struct {
+	logger *slog.Logger
+}
+
 //UDP: Info about SERVE a SINGLE FILE did move to README read about it there
 
 func main() {
@@ -30,6 +37,12 @@ func main() {
 		//AddSource: true,
 	}))
 
+	//Initialize a new instance of out application struct, containing the
+	//dependencies (for now, just the structured logger).
+	app := &application{
+		logger: logger,
+	}
+
 	mux := http.NewServeMux()
 
 	//UDP: Info about DISABLING dir listings move to README read about it there
@@ -50,10 +63,10 @@ func main() {
 	mux.Handle("GET /homed/{$}", &homeD{})
 	//EARLIER DONE BELOW
 	//udp: delete {$}  for unity with main guide line below
-	mux.HandleFunc("GET /", http.HandlerFunc(home))
-	mux.HandleFunc("GET /snippet/view/{id}/", snippetView)
-	mux.HandleFunc("GET /snippet/create", snippetCreate)
-	mux.HandleFunc("POST /snippet/create", snippetCreatePost)
+	mux.HandleFunc("GET /{$}", app.home)
+	mux.HandleFunc("GET /snippet/view/{id}/", app.snippetView)
+	mux.HandleFunc("GET /snippet/create", app.snippetCreate)
+	mux.HandleFunc("POST /snippet/create", app.snippetCreatePost)
 
 	//The value returned from the flag.String() function is a pointer to the flag
 	//value, not the value itself. So in this code, that means the addr variable
