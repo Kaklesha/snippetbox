@@ -27,7 +27,7 @@ func main() {
 	mux.Handle("GET /homed/{$}", &homeD{})
 	//EARLIER DONE BELOW
 	//udp: delete {$}  for unity with main guide line below
-	mux.HandleFunc("GET /", home)
+	mux.HandleFunc("GET /", http.HandlerFunc(home))
 	mux.HandleFunc("GET /snippet/view/{id}/", snippetView)
 	mux.HandleFunc("GET /snippet/create", snippetCreate)
 	mux.HandleFunc("POST /snippet/create", snippetCreatePost)
