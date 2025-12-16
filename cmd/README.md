@@ -62,3 +62,33 @@ flag.StringVar(&cfg.addr, "addr", ":4000", "HTTP network address")
 flag.StringVar(&cfg.staticDir, "static-dir", "./ui/static", "Path to static assets")
 flag.Parse()
 ```
+
+
+### JSON formatted logs
+The ```slog.NewTextHandler()``` function that we've used in this chapter creates a handler that
+writes plaintext log entries. But it’s possible to create a handler that writes log entries as
+JSON objects instead using the ```slog.NewJSONHandler()``` function. Like so:
+``` logger := slog.New(slog.NewJSONHandler (os.Stdout, nil))```
+When using the JSON handler, the log output will look similar to this:
+```
+{"time":"2024-03-18T11:29:23.00000000+00:00","level":"INFO","msg":"starting server","addr":":4000"}
+{"time":"2024-03-18T11:29:23.00000000+00:00","level":"ERROR","msg":"listen tcp :4000: bind: address already in use"}
+```
+### Decoupled logging
+In this chapter we've set up our structured logger to write entries to os.Stdout - the
+standard out stream.
+The big benefit of writing log entries to os. Stdout is that your application and logging are
+decoupled. Your application itself isn't concerned with the routing or storage of the logs,
+and that can make it easier to manage the logs differently depending on the environment.
+During development, it’s easy to view the log output because the standard out stream is
+displayed in the terminal.
+In staging or production environments, you can redirect the stream to a final destination for
+viewing and archival. This destination could be on-disk files, or a logging service such as
+Splunk. Either way, the final destination of the logs can be managed by your execution
+environment independently of the application.
+For example, we could redirect the standard out stream to a on-disk file when starting the
+application like so:
+
+ ```go run ./cmd/web >> ./cmd/tmp/web/web.log``` 
+
+ Notes: a web.log file have to created before run command-line above

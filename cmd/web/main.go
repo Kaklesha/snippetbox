@@ -23,7 +23,12 @@ func main() {
 
 	//use the slog.New() function to initialize a new structured logger, which
 	// writes to the standard out stream and uses the default settings.
-	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
+	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+		////Minimum log lvl: override lvl severity
+		// Level: slog.LevelDebug,
+		////Caller location: absolute path to file where invoke a slog. Info() and its line
+		//AddSource: true,
+	}))
 
 	mux := http.NewServeMux()
 
