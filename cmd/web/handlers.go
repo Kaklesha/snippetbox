@@ -8,6 +8,15 @@ import (
 	"strconv"
 )
 
+// Additional information: example using
+// Instead of func named "home" we take empty a type named "homeD"
+// for demo corresponding mwthod ServerHTTP
+type homeD struct{}
+
+func (h *homeD) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("this is my homeD page"))
+}
+
 func home(w http.ResponseWriter, r *http.Request) {
 	////Manipulating the header map
 	//Set a new cache-control header . If an existing "Cache-Control" header exists

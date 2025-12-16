@@ -36,6 +36,10 @@ func main() {
 	//"static" prefix before the request reaches the file server.
 	mux.Handle("GET /static/", http.StripPrefix("/static/", fileServer))
 
+	//ROUTING REST API to HANDLERS the SECTION
+
+	//This line using for example more detailes about homeD into handler.go
+	mux.Handle("GET /homed/{$}", &homeD{})
 	//EARLIER DONE BELOW
 	//udp: delete {$}  for unity with main guide line below
 	mux.HandleFunc("GET /", home)
