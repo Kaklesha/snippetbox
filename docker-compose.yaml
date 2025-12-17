@@ -1,0 +1,24 @@
+version: '3.8' # Specify the Compose file version
+services:
+  db:
+    image: mysql:8.0 # Use the official MySQL 8.0 image from Docker Hub
+    container_name: mysql_db
+    restart: always
+    environment:
+      # Required environment variables for MySQL initialization
+      MYSQL_ROOT_PASSWORD: 1234 #
+      MYSQL_DATABASE: snippetbox
+      MYSQL_USER: xoaks
+      MYSQL_PASSWORD: 4321
+    ports:
+      # Map port 3306 on the host to port 3306 in the container
+      - "3306:3306"
+    volumes:
+      # Mount a named volume to persist the database data
+      - db_data:/var/lib/mysql
+      # Optional: Mount an initialization directory to run .sql or .sh files on first startup
+      # - ./mysql_init_scripts:/docker-entrypoint-initdb.d
+
+volumes:
+  # Define the named volume
+  db_data:
