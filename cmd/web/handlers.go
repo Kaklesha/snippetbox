@@ -8,15 +8,6 @@ import (
 	"strconv"
 )
 
-// Additional information: example using
-// Instead of func named "home" we take empty a type named "homeD"
-// for demo corresponding mwthod ServerHTTP
-type homeD struct{}
-
-func (h *homeD) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("this is my homeD page"))
-}
-
 // UDP: Changed the signature of the home handler so it is defined as a method against
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	////Manipulating the header map
@@ -66,8 +57,8 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		//assist with debugging.
 		//!UDP in here below implemented r.URL.String() that returns the full URL stirng
 		// Against r.URL.RequestURL that undefined (type *url.URL has no field or method RequestURL)
-		app.logger.Error(err.Error(), "method", r.Method, "url", r.URL.String())
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		app.serverError(w, r, err)
+		//http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 
@@ -81,7 +72,8 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	err = ts.ExecuteTemplate(w, "base", nil)
 	if err != nil {
 		log.Print(err.Error())
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		app.serverError(w, r, err)
+		//http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 	}
 }
 
