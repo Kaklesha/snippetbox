@@ -1,10 +1,13 @@
 package main
 
 import (
+	"database/sql"
 	"flag"
 	"log/slog"
 	"net/http"
 	"os"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 // Define an application struct to hold the application-wide dependencies fot the
@@ -24,6 +27,10 @@ func main() {
 	//This reads in the command-line flag value and assigns it to the addr
 	//otherwise it will always contain the default value of ":4000". If any errors are
 	//encountered during parsing the application will be terminated.
+
+	//Define a new command-line  flag for the MySql DSN string.
+	dsn := flag.String("dsn", "web:1234@/snippetbox?parseTime=true", "MySQL data source name")
+
 	flag.Parse()
 
 	//use the slog.New() function to initialize a new structured logger, which
@@ -35,6 +42,18 @@ func main() {
 		//AddSource: true,
 	}))
 
+	// To keep the main() function tidy I've put the code for creating a connection
+	// pool into the separate openDB() function below. We pass openDB() the DSN
+	// from the command-line flag.
+	db, err := openDB(*dsn)
+	if err != nil {
+		logger.Error(err.Error())
+		os.Exit(1)
+	}
+	// We also defer a call to db.Close(), so that the connection pool is closed
+	// before the main() function exits.
+	defer db.Close()
+
 	//Initialize a new instance of out application struct, containing the
 	//dependencies (for now, just the structured logger).
 	app := &application{
@@ -45,7 +64,7 @@ func main() {
 	logger.Info("starting server on ", slog.String("addr", *addr))
 	//And we pass the dereferenced addr pointer to http.ListenAndServe() too.
 	//go run ./cmd/web -addr=":9999"
-	err := http.ListenAndServe(*addr, app.routes())
+	err = http.ListenAndServe(*addr, app.routes())
 	//And we also use the Error() method to log any  error message returned by
 	//http.ListenAndServe() at Error severity (with no additional attributes),
 	//and then call os.Exit(1) to terminate the application with exit code 1.
@@ -56,4 +75,19 @@ func main() {
 	// code above.
 	logger.Error(err.Error())
 	os.Exit(1)
+}
+
+// the openDB function wraps sql.Open() and retuns a sql.DB connection pool
+// for a given DSN.
+func openDB(dsn string) (*sql.DB, error) {
+	db, err := sql.Open("mysql", dsn)
+	if err != nil {
+		return nil, err
+	}
+	err = db.Ping()
+	if err != nil {
+		db.Close()
+		return nil, err
+	}
+	return db, nil
 }
