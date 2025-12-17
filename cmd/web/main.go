@@ -7,14 +7,25 @@ import (
 	"net/http"
 	"os"
 
+	// Import the models package that we just created. You need to prefix this with
+	// whatever module path you set up back in chapter 02.01 (Project Setup and Creating
+	// a Module) so that the import statement looks like this:
+	// "{your-module-path}/internal/models". If you can't remember what module path you
+	// used, you can find it at the top of the go.mod file.
+	"snippetbox.kira.net/internal/models"
+
 	_ "github.com/go-sql-driver/mysql"
 )
 
 // Define an application struct to hold the application-wide dependencies fot the
 // web application. For now we'll only include the structured logger, but we'll
 // add more to this as the build progresses.
+// UDP
+// Add a snippets field to the application struct. This will allow us to
+// make the SnippetModel object available to our handlers.
 type application struct {
-	logger *slog.Logger
+	logger   *slog.Logger
+	snippets *models.SnippetModel
 }
 
 func main() {
@@ -56,8 +67,10 @@ func main() {
 
 	//Initialize a new instance of out application struct, containing the
 	//dependencies (for now, just the structured logger).
+	//UDP Add it tothe application dependencies.
 	app := &application{
-		logger: logger,
+		logger:   logger,
+		snippets: &models.SnippetModel{DB: db},
 	}
 
 	//ROUTING REST API to HANDLERS the SECTION
