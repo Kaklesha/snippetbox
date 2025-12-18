@@ -13,6 +13,8 @@ func (app *application) routes() *http.ServeMux {
 	mux.HandleFunc("GET /{$}", app.home)
 	mux.HandleFunc("GET /snippet/view/{id}", app.snippetView)
 	mux.HandleFunc("GET /snippet/create", app.snippetCreate)
+	mux.HandleFunc("GET /snippet/transaction", app.snippetTransact)
 	mux.HandleFunc("POST /snippet/create", app.snippetCreatePost)
+
 	return mux
 }

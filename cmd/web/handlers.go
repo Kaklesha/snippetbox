@@ -146,3 +146,14 @@ func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request
 	// Redirect the user to the relevant page for the snippet.
 	http.Redirect(w, r, fmt.Sprintf("/snippet/view/%d", id), http.StatusSeeOther)
 }
+func (app *application) snippetTransact(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	err := app.snippets.ExampleTransaction()
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+	w.Write([]byte(`{"transaction":"Display about successful..."}`))
+
+}
