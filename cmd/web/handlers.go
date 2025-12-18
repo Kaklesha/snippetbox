@@ -3,8 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"html/template"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -35,35 +33,44 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	w.Header()["X-XSS-Protection"] = []string{"1; mode=block"}
 	w.WriteHeader(http.StatusAccepted) //need type defore Write
 	////w.Write([]byte("HEllo from snippetbox"))
+	//Add use Latest () from snippetModel
+	snippets, err := app.snippets.Latest()
+	if err != nil {
+		app.serverError(w, r, err)
+		return
+	}
+	for _, snippet := range snippets {
+		fmt.Fprintf(w, "%+v\n", snippet)
+	}
 
 	// Initialize a slice containing the paths to the two files. It's important
 	// to note that file file containing our base template must be the *first*
 	//file in the slice
 
-	files := []string{
-		"./ui/html/base.html",
-		"./ui/html/partials/nav.html",
-		"./ui/html/pages/home.html",
-	}
+	// files := []string{
+	// 	"./ui/html/base.html",
+	// 	"./ui/html/partials/nav.html",
+	// 	"./ui/html/pages/home.html",
+	// }
 
 	//Use the template.ParseFiles() function to read the template file into a
 	//template set. If there's an error , we log the detailed error message, use
 	//the http.Error() function to send an Internal Server Error response to the
 	//  user , and then return from the handler so no subsequent code is executed.
 
-	ts, err := template.ParseFiles(files...)
-	if err != nil {
-		//Because the home handler is now a method against the application
-		//struct it can access its fields, including the structured logger.
-		//We'll use this to create a log entry at Error level containing the error
-		//message, also including the request method and URL as attributes to
-		//assist with debugging.
-		//!UDP in here below implemented r.URL.String() that returns the full URL stirng
-		// Against r.URL.RequestURL that undefined (type *url.URL has no field or method RequestURL)
-		app.serverError(w, r, err)
-		//http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
+	// ts, err := template.ParseFiles(files...)
+	// if err != nil {
+	// 	//Because the home handler is now a method against the application
+	// 	//struct it can access its fields, including the structured logger.
+	// 	//We'll use this to create a log entry at Error level containing the error
+	// 	//message, also including the request method and URL as attributes to
+	// 	//assist with debugging.
+	// 	//!UDP in here below implemented r.URL.String() that returns the full URL stirng
+	// 	// Against r.URL.RequestURL that undefined (type *url.URL has no field or method RequestURL)
+	// 	app.serverError(w, r, err)
+	// 	//http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+	// 	return
+	// }
 
 	//(DEPRECATE: we added ExecuteTemplate(_)) Then we use the Execute() method on the template set to write the
 	// template content as the response body. The last parameter to Execute()
@@ -72,12 +79,12 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 
 	//Use the ExecuteTemplate() method to write the content of the "base"
 	//template as the response body.
-	err = ts.ExecuteTemplate(w, "base", nil)
-	if err != nil {
-		log.Print(err.Error())
-		app.serverError(w, r, err)
-		//http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-	}
+	// err = ts.ExecuteTemplate(w, "base", nil)
+	// if err != nil {
+	// 	log.Print(err.Error())
+	// 	app.serverError(w, r, err)
+	////http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+	//}
 }
 
 // add a snippetView  handler function.
