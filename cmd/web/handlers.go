@@ -21,13 +21,9 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-
-	//!IMPORTANT: This a little deviation from the author's implementation
-	data, err := NewTemplateData(&snippets)
-	if err != nil {
-		app.serverError(w, r, err)
-	}
-	app.render(w, r, http.StatusOK, "home.html", *data)
+	data := app.newTemplateData(r)
+	data.Snippets = snippets
+	app.render(w, r, http.StatusOK, "home.html", data)
 
 }
 
@@ -55,13 +51,14 @@ func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	//!IMPORTANT: This a little deviation from the author's implementation
-	data, err := NewTemplateDatum(&snippet)
-	if err != nil {
-		app.serverError(w, r, err)
-	}
-	app.render(w, r, http.StatusOK, "view.html", *data)
 
+	//!IMPORTANT: This a little deviation from the author's implementation
+	// data, err := NewTemplateDatum(&snippet)
+
+	data := app.newTemplateData(r)
+	data.Snippet = &snippet
+
+	app.render(w, r, http.StatusOK, "view.html", data)
 }
 
 // Add a snippetCreate handler function.

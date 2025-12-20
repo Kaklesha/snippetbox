@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"html/template"
 	"path/filepath"
 
@@ -14,27 +13,9 @@ import (
 // to it as the build progresses.
 
 type templateData struct {
-	Snippet  models.Snippet
-	Snippets []models.Snippet
-}
-
-// !IMPORTANT: This a little deviation from the author's implementation
-func NewTemplateDatum(s *models.Snippet) (*templateData, error) {
-	if s == nil {
-		return nil, errors.New("templates: Pointer *models.Snippet is nil")
-	}
-	return &templateData{
-		Snippet: *s,
-	}, nil
-}
-
-func NewTemplateData(s *[]models.Snippet) (*templateData, error) {
-	if len(*s) == 0 {
-		return nil, errors.New("templates: Pointer *models.Snippet is nil")
-	}
-	return &templateData{
-		Snippets: *s,
-	}, nil
+	CurrentYear int
+	Snippet     *models.Snippet
+	Snippets    []models.Snippet
 }
 
 func newTemplateCache() (map[string]*template.Template, error) {

@@ -83,7 +83,7 @@ func main() {
 	}
 
 	//ROUTING REST API to HANDLERS the SECTION
-	logger.Info("starting server on ", slog.String("addr", *addr))
+	logger.Info("starting server", slog.String("addr", *addr))
 	//And we pass the dereferenced addr pointer to http.ListenAndServe() too.
 	//go run ./cmd/web -addr=":9999"
 	err = http.ListenAndServe(*addr, app.routes())
