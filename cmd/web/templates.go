@@ -12,15 +12,25 @@ import (
 // to it as the build progresses.
 
 type templateData struct {
-	Snippet models.Snippet
+	Snippet  models.Snippet
+	Snippets []models.Snippet
 }
 
 // !IMPORTANT: This a little deviation from the author's implementation
-func NewTemplateData(s *models.Snippet) (*templateData, error) {
+func NewTemplateDatum(s *models.Snippet) (*templateData, error) {
 	if s == nil {
 		return nil, errors.New("templates: Pointer *models.Snippet is nil")
 	}
 	return &templateData{
 		Snippet: *s,
+	}, nil
+}
+
+func NewTemplateData(s *[]models.Snippet) (*templateData, error) {
+	if len(*s) == 0 {
+		return nil, errors.New("templates: Pointer *models.Snippet is nil")
+	}
+	return &templateData{
+		Snippets: *s,
 	}, nil
 }
