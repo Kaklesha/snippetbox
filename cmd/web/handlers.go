@@ -11,7 +11,6 @@ import (
 
 // UDP: Changed the signature of the home handler so it is defined as a method against
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Server", "Go")
 	snippets, err := app.snippets.Latest()
 	if err != nil {
 		if errors.Is(err, models.ErrNoRecord) {
