@@ -1,20 +1,25 @@
 package main
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/justinas/alice"
+)
 
 // The routes() method returns a servemux containing our application routes.
 func (app *application) routes() http.Handler {
 	mux := http.NewServeMux()
 	fileServer := http.FileServer(http.Dir("./ui/static/"))
-	//Use the mux.Handle() function to register the file server as the handler for
-	// all URL paths that start with "./static" . For matching paths, we strip the
-	//"static" prefix before the request reaches the file server.
 	mux.Handle("GET /static/", http.StripPrefix("/static", fileServer))
 	mux.HandleFunc("GET /{$}", app.home)
 	mux.HandleFunc("GET /snippet/view/{id}", app.snippetView)
 	mux.HandleFunc("GET /snippet/create", app.snippetCreate)
-	mux.HandleFunc("GET /snippet/transaction", app.snippetTransact)
 	mux.HandleFunc("POST /snippet/create", app.snippetCreatePost)
+	// Create a middleware chain containing our 'standard' middleware
+	// which will be used for every request our application receives.
+	standard := alice.New(app.recoverPanic, app.logRequest, commonHeaders)
+	//	return app.recoverPanic(app.logRequest(commonHeaders(mux)))
 
-	return app.logRequest(commonHeaders(mux))
+	// Return the 'standard' middleware chain followed by the servemux.
+	return standard.Then(mux)
 }
