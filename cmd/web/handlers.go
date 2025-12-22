@@ -96,7 +96,7 @@ func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request
 	// Create an instance of the snippetCreateForm struct containing the values
 	// from the form and an empty map for any validation errors.
 	var form snippetCreateForm
-	err = app.formDecoder.Decode(&form, r.PostForm)
+	err = app.decodePostForm(r, &form)
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 		return
