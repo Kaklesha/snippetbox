@@ -15,6 +15,8 @@ import (
 	// used, you can find it at the top of the go.mod file.
 	"snippetbox.kira.net/internal/models"
 
+	"github.com/go-playground/form/v4"
+
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -28,6 +30,7 @@ type application struct {
 	logger        *slog.Logger
 	snippets      *models.SnippetModel
 	templateCache map[string]*template.Template
+	formDecoder   *form.Decoder
 }
 
 func main() {
@@ -72,6 +75,8 @@ func main() {
 		logger.Error(err.Error())
 		os.Exit(1)
 	}
+	//initialize a decoder instance
+	formDecoder := form.NewDecoder()
 
 	//Initialize a new instance of out application struct, containing the
 	//dependencies (for now, just the structured logger).
@@ -80,6 +85,7 @@ func main() {
 		logger:        logger,
 		snippets:      &models.SnippetModel{DB: db},
 		templateCache: templateCache,
+		formDecoder:   formDecoder,
 	}
 
 	//ROUTING REST API to HANDLERS the SECTION

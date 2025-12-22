@@ -93,19 +93,15 @@ func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	expires, err := strconv.Atoi(r.PostForm.Get("expires"))
+	// Create an instance of the snippetCreateForm struct containing the values
+	// from the form and an empty map for any validation errors.
+	var form snippetCreateForm
+	err = app.formDecoder.Decode(&form, r.PostForm)
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 		return
+	}
 
-	}
-	// Create an instance of the snippetCreateForm struct containing the values
-	// from the form and an empty map for any validation errors.
-	form := snippetCreateForm{
-		Title:   r.PostForm.Get("title"),
-		Content: r.PostForm.Get("content"),
-		Expires: expires,
-	}
 	// Because the Validator struct is embedded by the snippetCreateForm struct,
 	// we can call CheckField() directly on it to execute our validation checks.
 	// CheckField() will add the provided key and error message to the
