@@ -11,10 +11,10 @@ import (
 )
 
 type snippetCreateForm struct {
-	Title   string
-	Content string
-	Expires int
-	validator.Validator
+	Title               string `form:"title"`
+	Content             string `form:"content"`
+	Expires             int    `form:"expires"`
+	validator.Validator `form:"-"`
 }
 
 // UDP: Changed the signature of the home handler so it is defined as a method against
@@ -38,17 +38,11 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 // Changed the signature of the snippetView handler so it is defined as a method
 // against *application
 func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
-	//Extract the value of the id wildcard from the request using r.PathValue()
-	//and try to convert it to an integer using the strconv.Atoi() function. If
-	// return a 404 page not found response.
 	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil || id < 1 {
 		http.NotFound(w, r)
 		return
 	}
-	// Use the SnippetModel's Get() method to retrieve the data for a
-	// specific record based on its ID. If no matching record is found,
-	// return a 404 Not Found response.
 	snippet, err := app.snippets.Get(id)
 	if err != nil {
 		if errors.Is(err, models.ErrNoRecord) {
@@ -58,14 +52,17 @@ func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-
-	//!IMPORTANT: This a little deviation from the author's implementation
-	// data, err := NewTemplateDatum(&snippet)
-
+	// Use the PopString() method to retrieve the value for the "flash" key.
+	// PopString() also deletes the key and value from the session data, so it
+	// acts like a one-time fetch. If there is no matching key in the session
+	// data this will return the empty string.
+	flash := app.sessionManager.PopString(r.Context(), "flash")
 	data := app.newTemplateData(r)
 	data.Snippet = &snippet
-
+	// Pass the flash message to the template.
+	data.Flash = flash
 	app.render(w, r, http.StatusOK, "view.html", data)
+
 }
 
 // Add a snippetCreate handler function.
@@ -87,16 +84,11 @@ func (app *application) snippetCreate(w http.ResponseWriter, r *http.Request) {
 // Changed the signature of the snippetView handler so it is defined as a method
 // against *application
 func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
-	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
-		return
-	}
 
 	// Create an instance of the snippetCreateForm struct containing the values
 	// from the form and an empty map for any validation errors.
 	var form snippetCreateForm
-	err = app.decodePostForm(r, &form)
+	err := app.decodePostForm(r, &form)
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 		return
@@ -127,6 +119,10 @@ func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request
 		app.serverError(w, r, err)
 		return
 	}
+	//Use the Put() method to add a string value ("Snippet successfully
+	// created!") and the corresponding key ("flash") to the session data.
+	app.sessionManager.Put(r.Context(), "flash", "Snippet successfully created!")
+
 	http.Redirect(w, r, fmt.Sprintf("/snippet/view/%d", id), http.StatusSeeOther)
 }
 func (app *application) snippetTransact(w http.ResponseWriter, r *http.Request) {
