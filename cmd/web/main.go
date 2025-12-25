@@ -101,20 +101,18 @@ func main() {
 		formDecoder:    formDecoder,
 		sessionManager: sessionManager,
 	}
-
+	//Initialize a new http.Server struct. We set the Addr and Handler fields so
+	//that the server usess the same network address and routes as before.
+	srv := &http.Server{
+		Addr:    *addr,
+		Handler: app.routes(),
+	}
 	//ROUTING REST API to HANDLERS the SECTION
 	logger.Info("starting server", slog.String("addr", *addr))
 	//And we pass the dereferenced addr pointer to http.ListenAndServe() too.
 	//go run ./cmd/web -addr=":9999"
-	err = http.ListenAndServe(*addr, app.routes())
-	//And we also use the Error() method to log any  error message returned by
-	//http.ListenAndServe() at Error severity (with no additional attributes),
-	//and then call os.Exit(1) to terminate the application with exit code 1.
-	//IMPORT!! There is no structured logging equivalent to the log.Fatal() function
-	// that we can use to handle an error returned by http.ListenAndServe().Instead, the
-	// closest we can get is logging a message at the Error severity level and then manually
-	// calling os.Exit(1) to terminate the application with the exit code 1, like we are in the
-	// code above.
+	err = srv.ListenAndServe()
+
 	logger.Error(err.Error())
 	os.Exit(1)
 }
