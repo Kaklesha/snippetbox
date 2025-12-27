@@ -116,7 +116,7 @@ func main() {
 	logger.Info("starting server", slog.String("addr", *addr))
 	//And we pass the dereferenced addr pointer to http.ListenAndServe() too.
 	//go run ./cmd/web -addr=":9999"
-	err = srv.ListenAndServe()
+	err = srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
 
 	logger.Error(err.Error())
 	os.Exit(1)
