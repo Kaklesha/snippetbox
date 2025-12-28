@@ -129,6 +129,10 @@ func main() {
 		// could pass slog.LevelWarn as the final parameter.
 		ErrorLog:  slog.NewLogLogger(logger.Handler(), slog.LevelWarn),
 		TLSConfig: tlsConfig,
+		//Add idle , read and write timeouts to the server.
+		IdleTimeout:  time.Minute,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
 	}
 	//ROUTING REST API to HANDLERS the SECTION
 	logger.Info("starting server", slog.String("addr", *addr))
