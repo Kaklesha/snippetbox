@@ -34,6 +34,7 @@ import (
 type application struct {
 	logger         *slog.Logger
 	snippets       *models.SnippetModel
+	users          *models.UserModel
 	templateCache  map[string]*template.Template
 	formDecoder    *form.Decoder
 	sessionManager *scs.SessionManager
@@ -95,9 +96,13 @@ func main() {
 	//Initialize a new instance of out application struct, containing the
 	//dependencies (for now, just the structured logger).
 	//UDP Add it tothe application dependencies.
+
+	//Initialize a models/UserModel instance and dd it to the application
+	//dependencies.
 	app := &application{
 		logger:         logger,
 		snippets:       &models.SnippetModel{DB: db},
+		users:          &models.UserModel{DB: db},
 		templateCache:  templateCache,
 		formDecoder:    formDecoder,
 		sessionManager: sessionManager,
