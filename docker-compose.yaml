@@ -1,4 +1,4 @@
-version: '3.8' # Specify the Compose file version
+# version: '3.8' # Specify the Compose file version
 services:
   db:
     image: mysql:8.0 # Use the official MySQL 8.0 image from Docker Hub
