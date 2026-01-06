@@ -92,6 +92,8 @@ func main() {
 	sessionManager := scs.New()
 	sessionManager.Store = mysqlstore.New(db)
 	sessionManager.Lifetime = 12 * time.Hour
+	//By default set SameSite=Lax instead of SameSite=Struct as below
+	//	sessionManager.Cookie.SameSite = http.SameSiteStrictMode
 
 	//Initialize a new instance of out application struct, containing the
 	//dependencies (for now, just the structured logger).
@@ -121,6 +123,7 @@ func main() {
 			tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256,
 			tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,
 		},
+		MinVersion: tls.VersionTLS13,
 	}
 
 	//Initialize a new http.Server struct. We set the Addr and Handler fields so
