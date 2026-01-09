@@ -33,9 +33,9 @@ func (app *application) logRequest(next http.Handler) http.Handler {
 			ip     = r.RemoteAddr
 			proto  = r.Proto
 			method = r.Method
-			uri    = r.URL.RequestURI()
+			url    = r.URL.RequestURI()
 		)
-		app.logger.Info("received request", "ip", ip, "proto", proto, "method", method, "uri", uri)
+		app.logger.Info("received request", "ip", ip, "proto", proto, "method", method, "url", url)
 		next.ServeHTTP(w, r)
 	})
 }

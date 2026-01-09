@@ -18,6 +18,7 @@ import (
 	"snippetbox.kira.net/internal/models"
 
 	"github.com/go-playground/form/v4"
+	"github.com/lmittmann/tint"
 
 	"github.com/alexedwards/scs/mysqlstore" // New import
 	"github.com/alexedwards/scs/v2"         // New import
@@ -45,7 +46,7 @@ func main() {
 	//Define a new command-line flag with the name 'addr', a default value of ":4000"
 	//and some short help text explaning what the flag controls. The value of the
 	//flag will be stored in the addr variable at runtime.
-	addr := flag.String("addr", ":4000", "HTTP network address")
+	addr := flag.String("addr", "127.0.0.1:4000", "HTTP network address")
 	//Importantly , we use the flag.Parse() function to parse the command-line flag.
 	//This reads in the command-line flag value and assigns it to the addr
 	//otherwise it will always contain the default value of ":4000". If any errors are
@@ -58,13 +59,18 @@ func main() {
 
 	//use the slog.New() function to initialize a new structured logger, which
 	// writes to the standard out stream and uses the default settings.
-	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-		////Minimum log lvl: override lvl severity
-		// Level: slog.LevelDebug,
-		////Caller location: absolute path to file where invoke a slog. Info() and its line
-		//AddSource: true,
-	}))
+	// logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+	// 	////Minimum log lvl: override lvl severity
+	// 	// Level: slog.LevelDebug,
+	// 	////Caller location: absolute path to file where invoke a slog. Info() and its line
+	// 	AddSource: true,
+	// }))
 
+	const LevelTrace = slog.LevelDebug - 4
+	logger := slog.New(tint.NewHandler(os.Stdout, &tint.Options{
+		Level:     LevelTrace,
+		AddSource: true,
+	}))
 	// To keep the main() function tidy I've put the code for creating a connection
 	// pool into the separate openDB() function below. We pass openDB() the DSN
 	// from the command-line flag.

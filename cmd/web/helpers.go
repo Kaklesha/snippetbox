@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"log/slog"
 	"net/http"
+	"runtime"
 	"time"
 
 	"github.com/go-playground/form/v4"
@@ -57,12 +59,16 @@ func (app *application) serverError(w http.ResponseWriter, r *http.Request, err 
 	var (
 		method = r.Method
 		url    = r.URL.String()
-		////added stack traces
-		//trace = string(debug.Stack())
+	////added stack traces
+	//trace = string(debug.Stack())
 	)
-	////Below commented Stack traces version logger
-	//app.logger.Error(err.Error(), "method", method, "url", url, "trace", trace)
-	app.logger.Error(err.Error(), "method", method, "url", url)
+	level := slog.LevelError
+	const depth = 1
+	var pcs [depth]uintptr
+	runtime.Callers(depth+1, pcs[:]) // +1 to skip runtime.Callers itself
+	record := slog.NewRecord(time.Now(), level, err.Error(), pcs[0])
+	record.AddAttrs(slog.String("method", method), slog.String("url", url))
+	app.logger.Handler().Handle(r.Context(), record)
 }
 
 // the clientError helper sends a specific status code and corresponding description
